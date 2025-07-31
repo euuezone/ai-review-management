@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 업무 활용화 방안 리뷰 관리 시트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .tab-button.active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #f3f4f6;
+            z-index: 10;
+        }
+        td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 16px;
+            min-width: 120px;
+        }
+        td[contenteditable="true"] {
+            background-color: #f9fafb;
+        }
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #3b82f6;
+            background-color: #eff6ff;
+        }
+        .form-question {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        .form-radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .form-radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .form-radio-input {
+            margin-right: 0.5rem;
+            height: 1rem;
+            width: 1rem;
+        }
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: border-color 0.2s;
+        }
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px #bfdbfe;
+        }
+        .add-row-btn {
+            background-color: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .add-row-btn:hover {
+            background-color: #059669;
+        }
+        .delete-row-btn {
+             opacity: 0;
+             transition: opacity 0.2s;
+             cursor: pointer;
+        }
+        tr:hover .delete-row-btn {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-6 md:p-8">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-gray-200">
+            <h1 class="text-2xl font-bold text-gray-800">AI 업무 활용화 방안 리뷰 관리 시트</h1>
+            <p class="text-sm text-gray-500 mt-1">핵심 목표(KPI) 달성 현황과 AI 활용 사례를 중심으로 프로젝트를 관리합니다.</p>
+        </div>
+
+        <!-- Tab Buttons -->
+        <div class="px-6 border-b border-gray-200">
+            <nav class="flex flex-wrap -mb-px" aria-label="Tabs">
+                <button onclick="changeTab(event, 'summary-dashboard')" class="tab-button active text-sm sm:text-base font-medium whitespace-nowrap px-3 py-3 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300">
+                    요약 대시보드
+                </button>
+                 <button onclick="changeTab(event, 'team-progress')" class="tab-button text-sm sm:text-base font-medium whitespace-nowrap px-3 py-3 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300">
+                    프로젝트 적용 사례
+                </button>
+                <button onclick="changeTab(event, 'version-progress')" class="tab-button text-sm sm:text-base font-medium whitespace-nowrap px-3 py-3 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300">
+                    버전별 진행 내용
+                </button>
+                <button onclick="changeTab(event, 'review-schedule')" class="tab-button text-sm sm:text-base font-medium whitespace-nowrap px-3 py-3 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300">
+                    리뷰 일정 관리
+                </button>
+                <button onclick="changeTab(event, 'survey-status')" class="tab-button text-sm sm:text-base font-medium whitespace-nowrap px-3 py-3 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300">
+                    리뷰 후 설문조사 관리
+                </button>
+                <button onclick="changeTab(event, 'survey-form')" class="tab-button text-sm sm:text-base font-medium whitespace-nowrap px-3 py-3 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300">
+                    설문지
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="p-4 sm:p-6">
+            <!-- Sheet 0: 요약 대시보드 -->
+            <div id="summary-dashboard" class="tab-content active">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Card 1: KPI 달성 현황 -->
+                    <div class="bg-blue-50 border border-blue-200 p-5 rounded-lg shadow-sm lg:col-span-2">
+                        <h3 class="font-bold text-blue-800">핵심 목표(KPI) 달성 현황</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-4">
+                            <!-- KPI 1 -->
+                            <div>
+                                <h4 class="font-semibold text-gray-700">1) AI 활용 디자인 업무 자동화</h4>
+                                <p class="text-sm text-gray-500 mt-1">목표: 해당 업무 비용 30% 이상 절감</p>
+                                <div class="mt-3 bg-white p-4 rounded-md">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-medium text-gray-600">현재 평균 비용 절감률</span>
+                                        <span id="kpi-cost-reduction" class="text-2xl font-bold text-blue-600">0%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                                        <div id="kpi-cost-reduction-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- KPI 2 -->
+                            <div>
+                                <h4 class="font-semibold text-gray-700">2) AI 활용 업무 효율화 방안 전파</h4>
+                                <p class="text-sm text-gray-500 mt-1">목표: 구성원 100% 교육 참여</p>
+                                <div class="mt-3 bg-white p-4 rounded-md space-y-4">
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-sm font-medium text-gray-600">v1.0 교육 참여율</span>
+                                            <span class="text-sm font-medium text-green-700">100%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                            <div class="bg-green-600 h-2.5 rounded-full" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-sm font-medium text-gray-600">v1.1 교육 참여율</span>
+                                            <span class="text-sm font-medium text-green-700">85%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                            <div class="bg-green-600 h-2.5 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Card 2: 문서 버전 현황 -->
+                     <div class="bg-gray-50 p-5 rounded-lg shadow">
+                        <h3 class="font-bold text-gray-700 mb-4">문서 버전 현황</h3>
+                        <div id="version-status-summary" class="space-y-4">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Card 3: 버전별 종합 현황 -->
+                    <div class="bg-gray-50 p-5 rounded-lg shadow">
+                        <h3 class="font-bold text-gray-700">버전별 종합 현황</h3>
+                        <div class="space-y-6 mt-4">
+                            <!-- v1.0 Status -->
+                            <div>
+                                <h4 class="font-semibold text-gray-600">v1.0 리뷰 현황</h4>
+                                <div class="mt-3">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium text-gray-500">리뷰 진행률 (2/2 팀)</span>
+                                        <span class="text-sm font-medium text-blue-700">100%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium text-gray-500">설문 참여율 (2/4 명)</span>
+                                        <span class="text-sm font-medium text-green-700">50%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-green-600 h-2.5 rounded-full" style="width: 50%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!-- Card 4: 최근 프로젝트 적용 사례 -->
+                    <div class="bg-gray-50 p-5 rounded-lg shadow">
+                        <h3 class="font-bold text-gray-700">최근 프로젝트 적용 사례</h3>
+                        <ul id="recent-cases-summary" class="mt-4 space-y-3">
+                           <!-- Populated by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sheet 1: 프로젝트 적용 사례 -->
+            <div id="team-progress" class="tab-content overflow-x-auto">
+                <table id="case-study-table" class="w-full text-sm text-left text-gray-700">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3">적용 업무</th>
+                            <th class="px-4 py-3">활용 AI 도구</th>
+                            <th class="px-4 py-3">기존 소요시간(H)</th>
+                            <th class="px-4 py-3">AI 도입 후 소요시간(H)</th>
+                            <th class="px-4 py-3 font-bold text-blue-600">시간 절감률(%)</th>
+                            <th class="px-4 py-3">담당자/팀</th>
+                            <th class="px-4 py-3">등록일</th>
+                            <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody><!-- Populated by JavaScript --></tbody>
+                </table>
+                <button class="add-row-btn" data-collection="project-cases">사례 추가</button>
+            </div>
+            
+            <!-- Sheet 2: 버전별 진행 내용 -->
+            <div id="version-progress" class="tab-content overflow-x-auto">
+                <table id="version-table" class="w-full text-sm text-left text-gray-700">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3">버전</th>
+                            <th class="px-4 py-3">업데이트 일자</th>
+                            <th class="px-4 py-3 w-1/4">주요 변경 사항</th>
+                            <th class="px-4 py-3 w-1/3">주요 피드백 및 조치사항</th>
+                            <th class="px-4 py-3">담당자</th>
+                            <th class="px-4 py-3">상태</th>
+                             <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody><!-- Populated by JavaScript --></tbody>
+                </table>
+                 <button class="add-row-btn" data-collection="versions">버전 추가</button>
+            </div>
+
+            <!-- Sheet 3: 리뷰 일정 관리 -->
+            <div id="review-schedule" class="tab-content overflow-x-auto">
+                <table id="schedule-table" class="w-full text-sm text-left text-gray-700">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3">팀명</th>
+                            <th class="px-4 py-3">리뷰 일자</th>
+                            <th class="px-4 py-3">리뷰 시간</th>
+                            <th class="px-4 py-3">버전</th>
+                            <th class="px-4 py-3">주요 리뷰 내용</th>
+                            <th class="px-4 py-3">참석자</th>
+                            <th class="px-4 py-3">진행 상태</th>
+                            <th class="px-4 py-3">비고</th>
+                             <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody><!-- Populated by JavaScript --></tbody>
+                </table>
+                 <button class="add-row-btn" data-collection="schedules">일정 추가</button>
+            </div>
+
+            <!-- Sheet 4: 리뷰 후 설문조사 관리 -->
+            <div id="survey-status" class="tab-content overflow-x-auto">
+                <table id="survey-table" class="w-full text-sm text-left text-gray-700">
+                     <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left font-medium">팀명</th>
+                            <th class="px-6 py-3 text-left font-medium">팀원</th>
+                            <th class="px-6 py-3 text-left font-medium">참여 여부</th>
+                            <th class="px-6 py-3 text-left font-medium">제출 일자</th>
+                            <th class="px-6 py-3 text-left font-medium">비고</th>
+                             <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody><!-- Populated by JavaScript --></tbody>
+                </table>
+                <button class="add-row-btn" data-collection="surveys">팀원 추가</button>
+            </div>
+            
+            <!-- Sheet 5: 설문지 -->
+            <div id="survey-form" class="tab-content">
+                <div class="max-w-2xl mx-auto py-4">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">AI 업무 활용화 방안 리뷰 피드백 설문</h2>
+                    <p class="text-sm text-gray-600 mb-6">소중한 의견을 통해 더 나은 방향으로 개선해 나가겠습니다.</p>
+                    
+                    <form onsubmit="event.preventDefault(); alert('설문이 제출되었습니다. 감사합니다!'); this.reset();">
+                        <div class="form-question">
+                            <label class="form-label">1. 오늘 리뷰에 대해 전반적으로 얼마나 만족하셨나요?</label>
+                            <div class="form-radio-group">
+                                <label class="form-radio-label"><input type="radio" name="satisfaction" value="5" class="form-radio-input"> 매우 만족</label>
+                                <label class="form-radio-label"><input type="radio" name="satisfaction" value="4" class="form-radio-input"> 만족</label>
+                                <label class="form-radio-label"><input type="radio" name="satisfaction" value="3" class="form-radio-input"> 보통</label>
+                                <label class="form-radio-label"><input type="radio" name="satisfaction" value="2" class="form-radio-input"> 불만족</label>
+                                <label class="form-radio-label"><input type="radio" name="satisfaction" value="1" class="form-radio-input"> 매우 불만족</label>
+                            </div>
+                        </div>
+
+                        <div class="form-question">
+                            <label class="form-label">2. AI 업무 활용화 방안의 내용을 얼마나 이해하셨나요?</label>
+                            <div class="form-radio-group">
+                                <label class="form-radio-label"><input type="radio" name="comprehension" value="5" class="form-radio-input"> 완벽히 이해함</label>
+                                <label class="form-radio-label"><input type="radio" name="comprehension" value="4" class="form-radio-input"> 대부분 이해함</label>
+                                <label class="form-radio-label"><input type="radio" name="comprehension" value="3" class="form-radio-input"> 보통</label>
+                                <label class="form-radio-label"><input type="radio" name="comprehension" value="2" class="form-radio-input"> 일부 이해하지 못함</label>
+                                <label class="form-radio-label"><input type="radio" name="comprehension" value="1" class="form-radio-input"> 거의 이해하지 못함</label>
+                            </div>
+                        </div>
+
+                        <div class="form-question">
+                            <label class="form-label">3. 현재 업무에 AI를 어느정도 활용하고 계신가요?</label>
+                            <div class="form-radio-group">
+                                <label class="form-radio-label"><input type="radio" name="usage" value="active" class="form-radio-input"> 적극적으로 활용 중</label>
+                                <label class="form-radio-label"><input type="radio" name="usage" value="sometimes" class="form-radio-input"> 가끔 활용 중</label>
+                                <label class="form-radio-label"><input type="radio" name="usage" value="experienced" class="form-radio-input"> 활용해 본 경험 있음</label>
+                                <label class="form-radio-label"><input type="radio" name="usage" value="none" class="form-radio-input"> 아직 활용해 본 경험 없음</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-question">
+                            <label for="current_workflow" class="form-label">4. 현재 AI를 적용하고 있는 본인의 업무 워크플로우를 설명해주세요.</label>
+                            <textarea id="current_workflow" name="current_workflow" rows="4" class="form-textarea" placeholder="예: 주간 보고서 초안 작성 시, 관련 데이터를 ChatGPT에 입력하여 개요와 핵심 요약 부분을 생성하고 있습니다."></textarea>
+                        </div>
+
+                        <div class="form-question">
+                            <label for="future_workflow" class="form-label">5. AI를 새롭게 적용해보고 싶거나, 개선하고 싶은 본인의 업무 워크플로우가 있다면 설명해주세요.</label>
+                            <textarea id="future_workflow" name="future_workflow" rows="4" class="form-textarea" placeholder="예: 고객 문의 이메일에 대해 유형별(단순 문의, 불만, 기술 지원 등)로 자동 분류하고, 각 유형에 맞는 답변 템플릿을 추천받는 워크플로우를 만들고 싶습니다."></textarea>
+                        </div>
+
+                        <div class="form-question">
+                            <label for="improvement" class="form-label">6. AI 활용 방안이나 관련 도구에서 개선이 필요하다고 생각하는 점을 자유롭게 작성해주세요.</label>
+                            <textarea id="improvement" name="improvement" rows="4" class="form-textarea" placeholder="예: 데이터 분석 결과의 시각화 기능이 더 다양했으면 좋겠습니다."></textarea>
+                        </div>
+
+                        <div class="form-question">
+                            <label for="etc" class="form-label">7. 기타 의견이나 제안사항이 있다면 자유롭게 작성해주세요.</label>
+                            <textarea id="etc" name="etc" rows="4" class="form-textarea" placeholder="리뷰 진행 방식, 시간 등 어떤 의견이든 좋습니다."></textarea>
+                        </div>
+
+                        <div class="text-right mt-8">
+                            <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                                설문 제출하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Tab Switching Logic ---
+        window.changeTab = function(event, tabID) {
+            let tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+
+            let tablinks = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+
+            document.getElementById(tabID).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // --- Sample Data for Demo ---
+        const sampleData = {
+            'project-cases': [
+                { task: '광고 배너 10종 제작', tool: 'Midjourney', beforeTime: 20, afterTime: 8, owner: 'B-2팀', date: '2024-07-28' },
+                { task: '주간 보고서 초안 작성', tool: 'ChatGPT', beforeTime: 4, afterTime: 1, owner: 'A-1팀', date: '2024-07-29' }
+            ],
+            'versions': [
+                { version: 'v1.0', updateDate: '2024-07-20', changes: '초기 버전 릴리즈', feedback: '저작권 가이드라인 명확화 요청', owner: '전체', status: '배포 완료' },
+                { version: 'v1.1', updateDate: '2024-08-10', changes: '챗봇 시나리오 추가', feedback: '', owner: 'A-1팀', status: '리뷰 진행 중' },
+                { version: 'v2.0', updateDate: '', changes: '데이터 시각화 AI 툴 연동', feedback: '', owner: 'C-3팀', status: '개발 진행 중' }
+            ],
+            'schedules': [
+                { team: 'A-1팀', reviewDate: '2024-08-12', reviewTime: '14:00', version: 'v1.1', topic: '챗봇 시나리오 개선', attendees: '김민준 외 2명', status: '예정', notes: '' }
+            ],
+            'surveys': [
+                { team: 'A-1팀', member: '김민준', status: '참여', submissionDate: '2024-07-25', notes: '' },
+                { team: 'A-1팀', member: '이서연', status: '미참여', submissionDate: '', notes: '휴가' }
+            ]
+        };
+
+        // --- Data Rendering Functions ---
+        function renderProjectCases() {
+            const tbody = document.querySelector('#case-study-table tbody');
+            tbody.innerHTML = '';
+            
+            sampleData['project-cases'].forEach((item, index) => {
+                const reduction = item.beforeTime > 0 ? (((item.beforeTime - item.afterTime) / item.beforeTime) * 100).toFixed(0) + '%' : '0%';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td contenteditable="true">${item.task}</td>
+                    <td contenteditable="true">${item.tool}</td>
+                    <td contenteditable="true" class="text-center">${item.beforeTime}</td>
+                    <td contenteditable="true" class="text-center">${item.afterTime}</td>
+                    <td class="font-bold text-center">${reduction}</td>
+                    <td contenteditable="true">${item.owner}</td>
+                    <td contenteditable="true">${item.date}</td>
+                    <td class="text-center"><button class="delete-row-btn" onclick="deleteRow(this, 'project-cases', ${index})">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateDashboard();
+        }
+
+        function renderVersions() {
+            const tbody = document.querySelector('#version-table tbody');
+            tbody.innerHTML = '';
+            
+            sampleData['versions'].forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td contenteditable="true">${item.version}</td>
+                    <td contenteditable="true">${item.updateDate}</td>
+                    <td contenteditable="true" class="w-1/4">${item.changes}</td>
+                    <td contenteditable="true" class="w-1/3">${item.feedback}</td>
+                    <td contenteditable="true">${item.owner}</td>
+                    <td contenteditable="true">${item.status}</td>
+                    <td class="text-center"><button class="delete-row-btn" onclick="deleteRow(this, 'versions', ${index})">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateVersionSummary();
+        }
+
+        function renderSchedules() {
+            const tbody = document.querySelector('#schedule-table tbody');
+            tbody.innerHTML = '';
+            
+            sampleData['schedules'].forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td contenteditable="true">${item.team}</td>
+                    <td contenteditable="true">${item.reviewDate}</td>
+                    <td contenteditable="true">${item.reviewTime}</td>
+                    <td contenteditable="true">${item.version}</td>
+                    <td contenteditable="true">${item.topic}</td>
+                    <td contenteditable="true">${item.attendees}</td>
+                    <td contenteditable="true">${item.status}</td>
+                    <td contenteditable="true">${item.notes}</td>
+                    <td class="text-center"><button class="delete-row-btn" onclick="deleteRow(this, 'schedules', ${index})">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSurveys() {
+            const tbody = document.querySelector('#survey-table tbody');
+            tbody.innerHTML = '';
+            
+            sampleData['surveys'].forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = item.status !== '참여' ? 'bg-red-50' : '';
+                tr.innerHTML = `
+                    <td contenteditable="true">${item.team}</td>
+                    <td contenteditable="true">${item.member}</td>
+                    <td contenteditable="true">${item.status}</td>
+                    <td contenteditable="true">${item.submissionDate}</td>
+                    <td contenteditable="true">${item.notes}</td>
+                    <td class="text-center"><button class="delete-row-btn" onclick="deleteRow(this, 'surveys', ${index})">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Dashboard Update Functions ---
+        function updateDashboard() {
+            const rows = document.querySelectorAll('#case-study-table tbody tr');
+            let totalReduction = 0;
+            let validEntries = 0;
+
+            rows.forEach(row => {
+                const beforeTime = parseFloat(row.cells[2].textContent) || 0;
+                const afterTime = parseFloat(row.cells[3].textContent) || 0;
+                if (beforeTime > 0) {
+                    totalReduction += ((beforeTime - afterTime) / beforeTime) * 100;
+                    validEntries++;
+                }
+            });
+
+            const averageReduction = validEntries > 0 ? (totalReduction / validEntries) : 0;
+            const kpiValueEl = document.getElementById('kpi-cost-reduction');
+            const kpiBarEl = document.getElementById('kpi-cost-reduction-bar');
+            const kpiGoal = 30;
+
+            if(kpiValueEl) kpiValueEl.textContent = averageReduction.toFixed(0) + '%';
+            if(kpiBarEl) {
+                const barPercentage = Math.min((averageReduction / kpiGoal) * 100, 100);
+                kpiBarEl.style.width = barPercentage + '%';
+            }
+        }
+        
+        function updateVersionSummary() {
+            const versionSummaryEl = document.getElementById('version-status-summary');
+            if (!versionSummaryEl) return;
+            versionSummaryEl.innerHTML = '';
+            
+            const statuses = ['배포 완료', '리뷰 진행 중', '개발 진행 중'];
+            const colors = {
+                '배포 완료': 'bg-green-100 text-green-800',
+                '리뷰 진행 중': 'bg-yellow-100 text-yellow-800',
+                '개발 진행 중': 'bg-blue-100 text-blue-800'
+            };
+            const labels = {
+                '배포 완료': '배포 완료 버전',
+                '리뷰 진행 중': '리뷰 진행 버전',
+                '개발 진행 중': '개발 진행 버전'
+            };
+
+            const allVersions = Array.from(document.querySelectorAll('#version-table tbody tr'));
+            
+            statuses.forEach(status => {
+                const versionRow = allVersions.find(row => row.cells[5].textContent === status);
+                if (versionRow) {
+                    const version = versionRow.cells[0].textContent;
+                    const date = versionRow.cells[1].textContent;
+                    versionSummaryEl.innerHTML += `
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-600">${labels[status]}</span>
+                            <div>
+                                ${date ? `<span class="text-xs text-gray-400 mr-2">${date}</span>` : ''}
+                                <span class="px-3 py-1 text-sm font-bold rounded-full ${colors[status]}">${version}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function updateRecentCases() {
+            const summaryEl = document.getElementById('recent-cases-summary');
+            if (!summaryEl) return;
+            summaryEl.innerHTML = '';
+            
+            sampleData['project-cases'].slice(0, 2).forEach(item => {
+                const reduction = item.beforeTime > 0 ? (((item.beforeTime - item.afterTime) / item.beforeTime) * 100).toFixed(0) + '%' : '0%';
+                summaryEl.innerHTML += `
+                     <li class="p-3 bg-white rounded-md text-sm text-gray-600">
+                        <span class="font-semibold text-blue-600">${item.owner}:</span> ${item.tool}로 ${item.task} 
+                        <span class="text-red-500 font-bold ml-2">(${reduction} 절감)</span>
+                     </li>
+                `;
+            });
+        }
+
+        // --- Event Handlers ---
+        function deleteRow(button, collection, index) {
+            if (confirm('정말 삭제하시겠습니까?')) {
+                sampleData[collection].splice(index, 1);
+                switch(collection) {
+                    case 'project-cases': renderProjectCases(); break;
+                    case 'versions': renderVersions(); break;
+                    case 'schedules': renderSchedules(); break;
+                    case 'surveys': renderSurveys(); break;
+                }
+            }
+        }
+
+        function addRow(collection) {
+            const newItem = {};
+            sampleData[collection].push(newItem);
+            switch(collection) {
+                case 'project-cases': renderProjectCases(); break;
+                case 'versions': renderVersions(); break;
+                case 'schedules': renderSchedules(); break;
+                case 'surveys': renderSurveys(); break;
+            }
+        }
+
+        // --- Initialize on page load ---
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProjectCases();
+            renderVersions();
+            renderSchedules();
+            renderSurveys();
+            updateRecentCases();
+        });
+
+        // --- Add row button handlers ---
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('add-row-btn')) {
+                const collection = e.target.dataset.collection;
+                addRow(collection);
+            }
+        });
+
+    </script>
+</body>
+</html> 
